@@ -34,9 +34,11 @@ int main(int argc,char * argv[])
 
   PID pid;
   // TODO: Initialize the pid variable.
-  double Init_Kp=atof(argv[1]);
-  double Init_Ki=atof(argv[2]);;
-  double Init_Kd=atof(argv[3]);;
+  // Manually tuned
+  double Init_Kp=0.2;//atof(argv[1]);
+  double Init_Ki=0.004;//atof(argv[2]);;
+  double Init_Kd=3.0;//atof(argv[3]);;
+  std::cout << "Init_Kp: " << Init_Kp << " Init_Kd: " << Init_Kd << std::endl;
   pid.Init(Init_Kp, Init_Ki, Init_Kd);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -64,6 +66,14 @@ int main(int argc,char * argv[])
           //steer_value = pid.Kp*pid.p_error + pid.Ki*pid.i_error + pid.Kd*pid.d_error;
 		  pid.UpdateError(cte) ;
 		  steer_value = pid.TotalError();
+		  if(steer_value>1.0)
+          {
+        	  	  steer_value=1.0;
+          }
+          else if(steer_value<-1.0)
+          {
+        	  	  steer_value=-1.0;
+          }
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
